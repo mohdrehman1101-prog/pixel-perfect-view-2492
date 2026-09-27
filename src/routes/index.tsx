@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 
 import { categories, menuItems } from "@/data/menu";
@@ -7,6 +7,10 @@ import logo from "@/assets/logo.png.asset.json";
 import headerLeft from "@/assets/header_left.jpg.asset.json";
 import headerRight from "@/assets/header_right.jpg.asset.json";
 import leaf from "@/assets/leaf.png.asset.json";
+import introVideo from "@/assets/bake-n-love-intro.mp4.asset.json";
+import introPoster from "@/assets/bake-n-love-intro-poster.webp.asset.json";
+
+const introSeenKey = "bake-n-love-intro-seen";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,9 +36,34 @@ export const Route = createFileRoute("/")({
 
 function Menu() {
   const navigate = useNavigate({ from: "/" });
+  const [showIntro, setShowIntro] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState("All");
   const [vegOnly, setVegOnly] = useState(false);
+
+  useEffect(() => {
+    // Returning from an item or category should go straight back to the menu.
+    if (window.sessionStorage.getItem(introSeenKey) === "yes") {
+      setShowIntro(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showIntro) return;
+    // Muted inline playback is supported by mobile autoplay policies.
+    const play = videoRef.current?.play();
+    play?.catch(() => {
+      // If playback is blocked or unsupported, do not trap visitors on the intro.
+      window.sessionStorage.setItem(introSeenKey, "yes");
+      setShowIntro(false);
+    });
+  }, [showIntro]);
+
+  const finishIntro = () => {
+    window.sessionStorage.setItem(introSeenKey, "yes");
+    setShowIntro(false);
+  };
 
   const items = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -51,6 +80,26 @@ function Menu() {
 
   const activeNote =
     active === "All" ? undefined : categories.find((c) => c.name === active)?.note;
+
+  if (showIntro) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background" aria-label="Bake N Love introduction">
+        <video
+          ref={videoRef}
+          className="h-full w-full object-contain"
+          src={introVideo.url}
+          poster={introPoster.url}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onEnded={finishIntro}
+          onError={finishIntro}
+          aria-label="Bake N Love opening video"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-menu-bg pb-10">

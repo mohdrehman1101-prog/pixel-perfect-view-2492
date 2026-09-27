@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+The menu intro uses the original uploaded MP4 via Lovable Assets and a first-frame poster; show it on the first menu visit per tab, then skip it on returns from details so navigation stays seamless.
