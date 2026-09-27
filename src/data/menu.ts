@@ -388,11 +388,13 @@ function pickImage(category: string, name: string, veg: boolean) {
 
 export const categories = CATEGORIES.map((c) => ({ name: c.name, icon: c.icon, note: c.note }));
 
+let itemCounter = 0;
+
 export const menuItems: MenuItem[] = CATEGORIES.flatMap((c) =>
-  c.items.map(([name, price, description, label], i) => {
+  c.items.map(([name, price, description, label]) => {
     const veg = isVeg(name);
     return {
-      id: `${c.name}-${i}`,
+      id: `item-${itemCounter++}`,
       name,
       price,
       description,
@@ -403,3 +405,15 @@ export const menuItems: MenuItem[] = CATEGORIES.flatMap((c) =>
     };
   }),
 );
+
+export function getItem(id: string) {
+  return menuItems.find((i) => i.id === id);
+}
+
+export function getCategory(name: string) {
+  return categories.find((c) => c.name === name);
+}
+
+export function getCategoryItems(name: string) {
+  return menuItems.filter((i) => i.category === name);
+}

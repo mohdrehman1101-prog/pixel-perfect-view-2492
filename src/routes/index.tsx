@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Menu() {
+  const navigate = useNavigate({ from: "/" });
   const [query, setQuery] = useState("");
   const [active, setActive] = useState("All");
   const [vegOnly, setVegOnly] = useState(false);
@@ -132,7 +133,12 @@ function Menu() {
                 <button
                   key={c.name}
                   type="button"
-                  onClick={() => setActive(c.name)}
+                  onClick={() => {
+                    setActive(c.name);
+                    if (c.name !== "All") {
+                      navigate({ to: "/category/$name", params: { name: c.name } });
+                    }
+                  }}
                   className={`font-body flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-[9px] text-[14px] font-medium transition-colors ${
                     isActive
                       ? "bg-menu-blue text-white shadow-[0_2px_6px_rgba(90,160,200,0.45)]"
@@ -154,9 +160,11 @@ function Menu() {
         {/* Cards */}
         <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4">
           {items.map((item) => (
-            <article
+            <Link
               key={item.id}
-              className="relative flex flex-col overflow-hidden rounded-[14px] bg-menu-card shadow-[0_3px_12px_rgba(120,90,60,0.1)]"
+              to="/item/$id"
+              params={{ id: item.id }}
+              className="relative flex flex-col overflow-hidden rounded-[14px] bg-menu-card shadow-[0_3px_12px_rgba(120,90,60,0.1)] transition-transform hover:scale-[1.02]"
             >
               <div className="relative">
                 <img
@@ -201,7 +209,7 @@ function Menu() {
                   className="pointer-events-none absolute bottom-2 right-2 h-5 w-[22px] opacity-70 mix-blend-multiply"
                 />
               </div>
-            </article>
+            </Link>
           ))}
         </div>
 
