@@ -58,12 +58,12 @@ function Menu() {
         <img
           src={headerLeft.url}
           alt=""
-          className="pointer-events-none absolute left-0 top-0 h-full w-[38%] object-cover"
+          className="pointer-events-none absolute left-0 top-0 h-full w-[46%] object-cover [mask-image:linear-gradient(to_right,black_62%,transparent)]"
         />
         <img
           src={headerRight.url}
           alt=""
-          className="pointer-events-none absolute right-0 top-0 h-full w-[16%] object-cover"
+          className="pointer-events-none absolute right-0 top-0 h-full w-[26%] object-cover [mask-image:linear-gradient(to_left,black_55%,transparent)]"
         />
         <img
           src={logo.url}
@@ -92,7 +92,7 @@ function Menu() {
         {/* Menu heading + Veg Only */}
         <div className="mt-5 flex items-start justify-between gap-3">
           <div className="relative">
-            <img src={leaf.url} alt="" className="absolute -left-2 top-1 h-6 w-7 opacity-70" />
+            <img src={leaf.url} alt="" className="absolute -left-2 top-1 h-6 w-7 opacity-70 mix-blend-multiply" />
             <h1 className="font-display pl-6 text-[38px] leading-[1] tracking-tight text-menu-ink">
               Menu
             </h1>
@@ -161,7 +161,7 @@ function Menu() {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="h-[88px] w-full rounded-[14px] object-cover"
+                  className="aspect-[362/150] w-full rounded-[14px] object-cover"
                 />
                 <span
                   className={`font-body absolute right-[6px] top-[6px] flex items-center gap-1 rounded-[7px] bg-white px-[7px] py-[3px] text-[10px] font-medium shadow-sm ${
@@ -197,7 +197,7 @@ function Menu() {
                 <img
                   src={leaf.url}
                   alt=""
-                  className="pointer-events-none absolute bottom-2 right-2 h-5 w-[22px] opacity-60"
+                  className="pointer-events-none absolute bottom-2 right-2 h-5 w-[22px] opacity-70 mix-blend-multiply"
                 />
               </div>
             </article>
