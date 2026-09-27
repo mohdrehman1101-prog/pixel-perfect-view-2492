@@ -65,6 +65,7 @@ function Menu() {
           alt=""
           className="pointer-events-none absolute right-0 top-0 h-full w-[26%] object-cover [mask-image:linear-gradient(to_left,black_55%,transparent)]"
         />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,transparent,var(--menu-sky)_38%,var(--menu-sky)_62%,transparent)] opacity-60" />
         <img
           src={logo.url}
           alt="Bake 'N Love Café & Bistro"
