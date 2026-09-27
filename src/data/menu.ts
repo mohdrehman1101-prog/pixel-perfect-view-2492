@@ -9,14 +9,14 @@ export type MenuItem = {
   id: string;
   name: string;
   price: string;
-  description?: string;
-  label?: string;
+  description?: string | undefined;
+  label?: string | undefined;
   category: string;
   veg: boolean;
   image: string;
 };
 
-type Raw = [name: string, price: string, description?: string, label?: string];
+type Raw = [name: string, price: string, description?: string | undefined, label?: string | undefined];
 
 const CATEGORIES: { name: string; icon: string; items: Raw[]; note?: string; label?: string }[] = [
   {
