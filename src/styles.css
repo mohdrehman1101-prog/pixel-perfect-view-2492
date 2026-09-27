@@ -19,6 +19,15 @@
  */
 
 @theme inline {
+  --color-menu-bg: var(--menu-bg);
+  --color-menu-card: var(--menu-card);
+  --color-menu-ink: var(--menu-ink);
+  --color-menu-sky: var(--menu-sky);
+  --color-menu-blue: var(--menu-blue);
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Lora", Georgia, serif;
+  --font-script: "Caveat", cursive;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -62,7 +71,13 @@
 }
 
 :root {
+  --menu-bg: oklch(0.976 0.013 85);
+  --menu-card: oklch(0.992 0.006 90);
+  --menu-ink: oklch(0.34 0.045 45);
+  --menu-sky: oklch(0.905 0.035 230);
+  --menu-blue: oklch(0.73 0.1 235);
   --radius: 0.625rem;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
