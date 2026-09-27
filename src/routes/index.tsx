@@ -209,7 +209,7 @@ function Menu() {
                   className="pointer-events-none absolute bottom-2 right-2 h-5 w-[22px] opacity-70 mix-blend-multiply"
                 />
               </div>
-            </article>
+            </Link>
           ))}
         </div>
 
