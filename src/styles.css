@@ -24,6 +24,24 @@
   --color-menu-ink: var(--menu-ink);
   --color-menu-sky: var(--menu-sky);
   --color-menu-blue: var(--menu-blue);
+  --color-cafe-page: var(--cafe-page);
+  --color-cafe-surface: var(--cafe-surface);
+  --color-cafe-blue: var(--cafe-blue);
+  --color-cafe-on-blue: var(--cafe-on-blue);
+  --color-cafe-search: var(--cafe-search);
+  --color-cafe-card: var(--cafe-card);
+  --color-cafe-row: var(--cafe-row);
+  --color-cafe-chip: var(--cafe-chip);
+  --color-cafe-ink: var(--cafe-ink);
+  --color-cafe-copy: var(--cafe-copy);
+  --color-cafe-muted: var(--cafe-muted);
+  --color-cafe-ring: var(--cafe-ring);
+  --color-cafe-heart: var(--cafe-heart);
+  --color-cafe-veg: var(--cafe-veg);
+  --color-cafe-nonveg: var(--cafe-nonveg);
+  --color-cafe-stars: var(--cafe-stars);
+  --color-cafe-detail-copy: var(--cafe-detail-copy);
+  --font-cafe: Arial, Helvetica, sans-serif;
   --font-display: "Playfair Display", Georgia, serif;
   --font-body: "Lora", Georgia, serif;
   --font-script: "Caveat", cursive;
@@ -71,6 +89,23 @@
 }
 
 :root {
+  --cafe-page: oklch(0.18 0 0);
+  --cafe-surface: oklch(1 0 0);
+  --cafe-blue: oklch(0.43 0.3 275);
+  --cafe-on-blue: oklch(1 0 0);
+  --cafe-search: oklch(0.92 0.03 264);
+  --cafe-card: oklch(0.92 0.04 262);
+  --cafe-row: oklch(0.98 0.015 264);
+  --cafe-chip: oklch(0.96 0.025 275);
+  --cafe-ink: oklch(0.18 0 0);
+  --cafe-copy: oklch(0.47 0.03 267);
+  --cafe-muted: oklch(0.65 0.025 265);
+  --cafe-ring: oklch(0.61 0.23 278 / 65%);
+  --cafe-heart: oklch(0.65 0.21 24);
+  --cafe-veg: oklch(0.61 0.17 143);
+  --cafe-nonveg: oklch(0.61 0.2 26);
+  --cafe-stars: oklch(0.88 0.19 94);
+  --cafe-detail-copy: oklch(0.85 0.08 275);
   --menu-bg: oklch(0.976 0.013 85);
   --menu-card: oklch(0.992 0.006 90);
   --menu-ink: oklch(0.34 0.045 45);
@@ -110,6 +145,40 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+@keyframes cafe-card-in {
+  from { opacity: 0; transform: translateX(35px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes cafe-drink-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@utility animate-card-in {
+  animation: cafe-card-in 0.55s ease both;
+}
+
+@utility animate-drink-float {
+  animation: cafe-drink-float 4s ease-in-out infinite;
+}
+
+@utility shadow-cafe-shell {
+  box-shadow: 0 0 40px color-mix(in oklab, var(--cafe-ink) 22%, transparent);
+}
+
+@utility drop-shadow-cafe {
+  filter: drop-shadow(0 16px 10px color-mix(in oklab, var(--cafe-ink) 18%, transparent));
+}
+
+@utility drop-shadow-cafe-strong {
+  filter: drop-shadow(0 25px 15px color-mix(in oklab, var(--cafe-ink) 25%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-card-in, .animate-drink-float { animation: none; }
 }
 
 .dark {
