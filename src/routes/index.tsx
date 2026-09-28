@@ -1,12 +1,9 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, Heart, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search } from "lucide-react";
 
-import { categories, menuItems } from "@/data/menu";
+import { categories, menuItems, type MenuItem } from "@/data/menu";
 import logo from "@/assets/logo.png.asset.json";
-import headerLeft from "@/assets/header_left.jpg.asset.json";
-import headerRight from "@/assets/header_right.jpg.asset.json";
-import leaf from "@/assets/leaf.png.asset.json";
 import introVideo from "@/assets/bake-n-love-intro.mp4.asset.json";
 import introPoster from "@/assets/bake-n-love-intro-poster.webp.asset.json";
 
@@ -15,18 +12,10 @@ const introSeenKey = "bake-n-love-intro-seen";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bake 'N Love — Café & Bistro Digital Menu" },
-      {
-        name: "description",
-        content:
-          "Freshly baked, just for you. Browse the Bake 'N Love café & bistro menu — pizzas, pastas, shakes, coffees, waffles and more.",
-      },
-      { property: "og:title", content: "Bake 'N Love — Café & Bistro Digital Menu" },
-      {
-        property: "og:description",
-        content:
-          "Freshly baked, just for you. Browse the Bake 'N Love café & bistro menu — pizzas, pastas, shakes, coffees, waffles and more.",
-      },
+      { title: "Bake 'N Love — Café & Bistro Menu" },
+      { name: "description", content: "Browse the complete Bake 'N Love café and bistro menu." },
+      { property: "og:title", content: "Bake 'N Love — Café & Bistro Menu" },
+      { property: "og:description", content: "Browse the complete Bake 'N Love café and bistro menu." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -37,237 +26,198 @@ export const Route = createFileRoute("/")({
 function Menu() {
   const navigate = useNavigate({ from: "/" });
   const [showIntro, setShowIntro] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [query, setQuery] = useState("");
-  const [active, setActive] = useState("All");
-  const [vegOnly, setVegOnly] = useState(false);
+  const [filter, setFilter] = useState("All");
+  const [specialIndex, setSpecialIndex] = useState(0);
+  const [detail, setDetail] = useState<MenuItem>();
+  const [favourites, setFavourites] = useState<Set<string>>(new Set());
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const catalogueRef = useRef<HTMLElement>(null);
+  const specials = menuItems.slice(0, 6);
 
   useEffect(() => {
-    // Returning from an item or category should go straight back to the menu.
-    if (window.sessionStorage.getItem(introSeenKey) === "yes") {
-      setShowIntro(false);
-    }
+    if (window.sessionStorage.getItem(introSeenKey) === "yes") setShowIntro(false);
   }, []);
 
   useEffect(() => {
     if (!showIntro) return;
-    // Muted inline playback is supported by mobile autoplay policies.
-    const play = videoRef.current?.play();
-    play?.catch(() => {
-      // If playback is blocked or unsupported, do not trap visitors on the intro.
+    videoRef.current?.play().catch(() => {
       window.sessionStorage.setItem(introSeenKey, "yes");
       setShowIntro(false);
     });
   }, [showIntro]);
+
+  useEffect(() => {
+    if (detail || showIntro) return;
+    const timer = window.setInterval(() => setSpecialIndex((value) => (value + 1) % specials.length), 4000);
+    return () => window.clearInterval(timer);
+  }, [detail, showIntro, specials.length]);
 
   const finishIntro = () => {
     window.sessionStorage.setItem(introSeenKey, "yes");
     setShowIntro(false);
   };
 
-  const items = useMemo(() => {
-    const q = query.trim().toLowerCase();
+  const results = useMemo(() => {
+    const search = query.trim().toLowerCase();
     return menuItems.filter((item) => {
-      if (active !== "All" && item.category !== active) return false;
-      if (vegOnly && !item.veg) return false;
-      if (!q) return true;
-      return (
-        item.name.toLowerCase().includes(q) ||
-        (item.description ?? "").toLowerCase().includes(q)
-      );
+      const categoryMatch =
+        filter === "All" ||
+        (filter === "Veg" && item.veg) ||
+        (filter === "Non-Veg" && !item.veg) ||
+        item.category === filter;
+      return categoryMatch && (!search || item.name.toLowerCase().includes(search) || item.description?.toLowerCase().includes(search));
     });
-  }, [query, active, vegOnly]);
+  }, [filter, query]);
 
-  const activeNote =
-    active === "All" ? undefined : categories.find((c) => c.name === active)?.note;
+  const grouped = useMemo(() => categories.map((category) => ({
+    ...category,
+    items: results.filter((item) => item.category === category.name),
+  })).filter((category) => category.items.length), [results]);
+
+  const toggleFavourite = (id: string) => {
+    setFavourites((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   if (showIntro) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background" aria-label="Bake N Love introduction">
-        <video
-          ref={videoRef}
-          className="h-full w-full object-contain"
-          src={introVideo.url}
-          poster={introPoster.url}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onEnded={finishIntro}
-          onError={finishIntro}
-          aria-label="Bake N Love opening video"
-        />
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background">
+        <video ref={videoRef} className="h-full w-full object-contain" src={introVideo.url} poster={introPoster.url}
+          autoPlay muted playsInline preload="auto" onEnded={finishIntro} onError={finishIntro} aria-label="Bake N Love opening video" />
       </div>
     );
   }
 
+  const special = specials[specialIndex];
+  if (!special) return null;
+
   return (
-    <div className="min-h-screen bg-menu-bg pb-10">
-      {/* Header */}
-      <header className="relative h-[100px] overflow-hidden bg-menu-sky">
-        <img
-          src={headerLeft.url}
-          alt=""
-          className="pointer-events-none absolute left-0 top-0 h-full w-[46%] object-cover [mask-image:linear-gradient(to_right,black_62%,transparent)]"
-        />
-        <img
-          src={headerRight.url}
-          alt=""
-          className="pointer-events-none absolute right-0 top-0 h-full w-[26%] object-cover [mask-image:linear-gradient(to_left,black_55%,transparent)]"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,transparent,var(--menu-sky)_38%,var(--menu-sky)_62%,transparent)] opacity-60" />
-        <img
-          src={logo.url}
-          alt="Bake 'N Love Café & Bistro"
-          className="absolute left-1/2 top-1/2 h-[112px] w-[112px] -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-sm"
-        />
-        <p className="font-script absolute right-[13%] top-1/2 -translate-y-1/2 text-right text-[15px] leading-[1.15] text-menu-ink">
-          Good Food
-          <br />
-          Good Mood <span className="text-[13px]">♡</span>
-        </p>
-      </header>
-
-      <main className="relative z-10 -mt-3 rounded-t-[18px] bg-menu-bg px-4 pt-4">
-        {/* Search */}
-        <div className="flex h-[52px] items-center gap-3 rounded-full bg-menu-card px-5 shadow-[0_2px_10px_rgba(120,90,60,0.08)]">
-          <Search className="size-[18px] shrink-0 text-menu-ink/70" strokeWidth={2.4} />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search your favourite food..."
-            className="font-body h-full w-full bg-transparent text-[15px] text-menu-ink placeholder:text-menu-ink/55 focus:outline-none"
-          />
-        </div>
-
-        {/* Menu heading + Veg Only */}
-        <div className="mt-5 flex items-start justify-between gap-3">
-          <div className="relative">
-            <img src={leaf.url} alt="" className="absolute -left-2 top-1 h-6 w-7 opacity-70 mix-blend-multiply" />
-            <h1 className="font-display pl-6 text-[38px] leading-[1] tracking-tight text-menu-ink">
-              Menu
-            </h1>
-            <p className="font-script mt-1 w-fit border-b border-menu-ink/40 pb-[3px] pl-6 text-[14px] text-menu-ink/90">
-              Freshly Baked, Just for You <span className="text-[12px]">♥</span>
-            </p>
+    <div className="min-h-screen bg-cafe-page font-cafe text-cafe-ink">
+      <div className="mx-auto min-h-screen w-full max-w-[430px] overflow-hidden bg-cafe-surface shadow-cafe-shell">
+        <header className="flex h-[140px] items-center gap-3 rounded-b-[35px] bg-cafe-blue px-[22px] pb-5 pt-[35px] text-cafe-on-blue">
+          <div className="grid size-14 shrink-0 place-items-center rounded-full bg-cafe-surface">
+            <img src={logo.url} alt="Bake 'N Love" className="size-14 object-contain" />
           </div>
+          <div>
+            <h1 className="text-[19px] font-bold">Bake 'N Love</h1>
+            <p className="mt-1 text-xs text-cafe-on-blue/70">Good food. Good mood.</p>
+          </div>
+        </header>
 
-          <button
-            type="button"
-            onClick={() => setVegOnly((v) => !v)}
-            aria-pressed={vegOnly}
-            className="flex shrink-0 items-center gap-2 rounded-full bg-menu-card px-3 py-2 shadow-[0_2px_8px_rgba(120,90,60,0.1)]"
-          >
-            <span className="font-body text-[13px] font-semibold text-menu-ink">Veg Only</span>
-            <span
-              className={`relative h-[22px] w-[40px] rounded-full transition-colors ${
-                vegOnly ? "bg-menu-blue" : "bg-menu-ink/20"
-              }`}
-            >
-              <span
-                className={`absolute top-[2px] size-[18px] rounded-full bg-white shadow transition-all ${
-                  vegOnly ? "left-[20px]" : "left-[2px]"
-                }`}
-              />
-            </span>
-          </button>
-        </div>
+        <label className="relative z-10 mx-auto -mt-px flex h-[63px] w-[calc(100%-45px)] items-center gap-3 rounded-[23px] bg-cafe-search px-5">
+          <Search className="size-6 shrink-0 text-cafe-blue" strokeWidth={2.2} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search here..."
+            className="h-full w-full bg-transparent text-base outline-none placeholder:text-cafe-muted" />
+        </label>
 
-        {/* Categories */}
-        <div className="-mx-4 mt-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex w-max items-center gap-2 rounded-full bg-menu-card/80 p-[6px] shadow-[0_2px_8px_rgba(120,90,60,0.08)]">
-            {[{ name: "All", icon: "" }, ...categories].map((c) => {
-              const isActive = active === c.name;
-              return (
-                <button
-                  key={c.name}
-                  type="button"
-                  onClick={() => {
-                    setActive(c.name);
-                    if (c.name !== "All") {
-                      navigate({ to: "/category/$name", params: { name: c.name } });
-                    }
-                  }}
-                  className={`font-body flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-[9px] text-[14px] font-medium transition-colors ${
-                    isActive
-                      ? "bg-menu-blue text-white shadow-[0_2px_6px_rgba(90,160,200,0.45)]"
-                      : "bg-menu-card text-menu-ink"
-                  }`}
-                >
-                  {c.icon ? <span className="text-[15px]">{c.icon}</span> : null}
-                  {c.name}
+        <section className="px-[22px] pt-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[27px] font-bold">New Menu</h2>
+            <button type="button" onClick={() => catalogueRef.current?.scrollIntoView({ behavior: "smooth" })}
+              className="text-[15px] font-semibold text-cafe-blue">View All</button>
+          </div>
+          <div className="-mr-[22px] flex gap-[15px] overflow-x-auto py-7 pr-[22px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {menuItems.slice(0, 6).map((item) => (
+              <article key={item.id} onClick={() => setDetail(item)} className="animate-card-in relative h-[305px] min-w-[160px] cursor-pointer rounded-[25px] bg-cafe-card p-[13px]">
+                <button type="button" aria-label={`Favourite ${item.name}`} onClick={(event) => { event.stopPropagation(); toggleFavourite(item.id); }}
+                  className="absolute right-[13px] top-[13px] z-10 text-cafe-heart">
+                  <Heart className="size-[22px]" fill={favourites.has(item.id) ? "currentColor" : "none"} />
                 </button>
-              );
-            })}
+                <div className="flex h-[190px] items-center justify-center overflow-hidden rounded-[18px]">
+                  <img src={item.image} alt={item.name} className="h-[185px] w-[145px] object-cover drop-shadow-cafe" />
+                </div>
+                <h3 className="mt-2 truncate text-base font-bold">{item.name}</h3>
+                <div className="mt-[7px] flex items-center justify-between">
+                  <span className="text-[21px] font-bold text-cafe-blue">₹{item.price}</span>
+                  <span className="grid size-11 place-items-center rounded-[13px] bg-cafe-ink text-cafe-surface"><ArrowRight className="size-5" /></span>
+                </div>
+              </article>
+            ))}
           </div>
-        </div>
+        </section>
 
-        {activeNote ? (
-          <p className="font-body mt-3 text-[12px] italic text-menu-ink/70">{activeNote}</p>
-        ) : null}
+        <section className="relative mt-[27px] h-[475px] overflow-hidden rounded-t-[30px] bg-cafe-blue text-cafe-on-blue">
+          <div className="absolute -right-[180px] top-5 size-[390px] rounded-full border-[70px] border-cafe-ring" />
+          <div className="absolute left-8 bottom-[34px] z-10 max-w-[185px]">
+            <small className="text-sm text-cafe-on-blue/65">Special</small>
+            <h2 className="mt-[7px] text-[38px] font-bold leading-[0.98]">{special.name}</h2>
+            <p className="mt-[13px] text-xl font-bold">₹{special.price}</p>
+          </div>
+          <button type="button" onClick={() => setDetail(special)} className="absolute -right-[65px] top-[30px] z-[3] size-[330px]">
+            <img key={special.id} src={special.image} alt={special.name} className="animate-drink-float size-full rounded-[36px] object-cover drop-shadow-cafe-strong" />
+          </button>
+          <div className="absolute left-[38px] top-[35px] z-[6] flex flex-col gap-[15px]">
+            {specials.slice(0, 3).map((item, index) => (
+              <button key={item.id} type="button" onClick={() => setSpecialIndex(index)}
+                className={`size-[62px] overflow-hidden rounded-full border-2 p-[5px] ${index === specialIndex ? "border-cafe-on-blue bg-cafe-on-blue/25" : "border-cafe-on-blue/70 bg-cafe-on-blue/10"} ${index === 1 ? "ml-[65px]" : index === 2 ? "ml-[55px]" : ""}`}>
+                <img src={item.image} alt={item.name} className="size-full rounded-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </section>
 
-        {/* Cards */}
-        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4">
-          {items.map((item) => (
-            <Link
-              key={item.id}
-              to="/item/$id"
-              params={{ id: item.id }}
-              className="relative flex flex-col overflow-hidden rounded-[14px] bg-menu-card shadow-[0_3px_12px_rgba(120,90,60,0.1)] transition-transform hover:scale-[1.02]"
-            >
-              <div className="relative">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="aspect-[362/150] w-full rounded-[14px] object-cover"
-                />
-                <span
-                  className={`font-body absolute right-[6px] top-[6px] flex items-center gap-1 rounded-[7px] bg-white px-[7px] py-[3px] text-[10px] font-medium shadow-sm ${
-                    item.veg ? "text-[#2f7a34]" : "text-[#8c2020]"
-                  }`}
-                >
-                  <span
-                    className={`inline-block size-[8px] rounded-[2px] ${
-                      item.veg ? "bg-[#3a8c3f]" : "bg-[#9c2626]"
-                    }`}
-                  />
-                  {item.veg ? "Veg" : "Non Veg"}
-                </span>
-                {item.label ? (
-                  <span className="font-body absolute left-[6px] top-[6px] rounded-[7px] bg-menu-blue px-[7px] py-[3px] text-[9px] font-semibold tracking-wide text-white shadow-sm">
-                    {item.label}
+        <section ref={catalogueRef} className="px-[22px] pb-[70px] pt-8">
+          <h2 className="text-[27px] font-bold">Restaurant Menu</h2>
+          <p className="mt-[5px] text-sm text-cafe-muted">Choose your favourite food</p>
+          <div className="sticky top-0 z-20 -mx-1 flex gap-[9px] overflow-x-auto bg-cafe-surface px-1 py-[15px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {["All", "Veg", "Non-Veg", ...categories.map((category) => category.name)].map((name) => (
+              <button key={name} type="button" onClick={() => setFilter(name)}
+                className={`shrink-0 rounded-full px-[17px] py-[11px] text-[13px] font-bold ${filter === name ? "bg-cafe-blue text-cafe-on-blue" : "bg-cafe-chip text-cafe-copy"}`}>
+                {name === "Veg" ? "🥗 Veg" : name === "Non-Veg" ? "🍗 Non-Veg" : name}
+              </button>
+            ))}
+          </div>
+
+          {grouped.map((category) => (
+            <div key={category.name} className="mt-[22px]">
+              <button type="button" onClick={() => navigate({ to: "/category/$name", params: { name: category.name } })}
+                className="mb-3 text-left text-[21px] font-bold">{category.icon} {category.name}</button>
+              {category.items.map((item) => (
+                <button key={item.id} type="button" onClick={() => setDetail(item)}
+                  className="mb-3 flex min-h-[100px] w-full items-center gap-3 rounded-[20px] bg-cafe-row p-3 text-left">
+                  <span className="grid size-[78px] shrink-0 place-items-center overflow-hidden rounded-[17px] bg-cafe-card">
+                    <img src={item.image} alt={item.name} className="size-[72px] rounded-[14px] object-cover" />
                   </span>
-                ) : null}
-              </div>
-
-              <div className="relative flex flex-1 flex-col px-3 pb-3 pt-2">
-                <h2 className="font-display text-[15px] leading-tight text-menu-ink">
-                  {item.name}
-                </h2>
-                {item.description ? (
-                  <p className="font-body mt-1 text-[11.5px] leading-[1.35] text-menu-ink/65">
-                    {item.description}
-                  </p>
-                ) : null}
-                <p className="font-body mt-2 text-[15px] font-semibold text-menu-ink">
-                  ₹ {item.price}
-                </p>
-                <img
-                  src={leaf.url}
-                  alt=""
-                  className="pointer-events-none absolute bottom-2 right-2 h-5 w-[22px] opacity-70 mix-blend-multiply"
-                />
-              </div>
-            </Link>
+                  <span className="min-w-0 flex-1">
+                    <strong className="block text-[15px]">{item.name}</strong>
+                    {item.description ? <span className="mt-[5px] line-clamp-2 block text-xs leading-[1.35] text-cafe-muted">{item.description}</span> : null}
+                    <span className="mt-[5px] flex items-center gap-1 text-[10px] text-cafe-copy">
+                      <i className={`size-2 rounded-[2px] border-2 not-italic ${item.veg ? "border-cafe-veg" : "border-cafe-nonveg"}`} />
+                      {item.veg ? "Veg" : "Non-Veg"}
+                    </span>
+                    <span className="mt-1 block text-[17px] font-bold text-cafe-blue">₹{item.price}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
           ))}
-        </div>
+          {!results.length ? <p className="py-12 text-center text-cafe-muted">No items found</p> : null}
+        </section>
 
-        {items.length === 0 ? (
-          <p className="font-body py-10 text-center text-[14px] text-menu-ink/70">
-            No items found.
-          </p>
-        ) : null}
-      </main>
+        <section aria-hidden={!detail} className={`fixed inset-0 z-50 mx-auto max-w-[430px] overflow-y-auto bg-cafe-surface transition-transform duration-500 ease-out ${detail ? "translate-x-0" : "translate-x-full"}`}>
+          {detail ? <>
+            <header className="flex h-[75px] items-center justify-between bg-cafe-blue px-[22px] text-cafe-on-blue">
+              <button type="button" aria-label="Back" onClick={() => setDetail(undefined)}><ArrowLeft className="size-7" /></button>
+              <h2 className="text-[22px] font-bold">Details</h2>
+              <button type="button" aria-label="Favourite" onClick={() => toggleFavourite(detail.id)}><Heart className="size-7" fill={favourites.has(detail.id) ? "currentColor" : "none"} /></button>
+            </header>
+            <div className="relative min-h-[520px] overflow-hidden bg-cafe-blue text-cafe-on-blue">
+              <div className="relative z-[3] w-[53%] px-6 pt-6">
+                <h1 className="text-[29px] font-bold leading-[1.05]">{detail.name}</h1>
+                <div className="mt-[13px] text-base text-cafe-stars">★★★★★ <span className="ml-1 text-cafe-on-blue">4.8</span></div>
+                <h3 className="mt-[27px] text-lg font-bold">Description</h3>
+                <p className="mt-[10px] text-sm leading-[1.55] text-cafe-detail-copy">{detail.description || `Freshly prepared ${detail.name}, served with Bake 'N Love care.`}</p>
+                <div className="mt-[22px] text-[28px] font-bold">₹{detail.price}</div>
+              </div>
+              <img src={detail.image} alt={detail.name} className="animate-drink-float absolute -right-[55px] bottom-[-25px] h-[390px] w-[280px] rounded-[45px] object-cover drop-shadow-cafe-strong" />
+            </div>
+          </> : null}
+        </section>
+      </div>
     </div>
   );
 }
