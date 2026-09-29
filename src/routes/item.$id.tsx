@@ -34,7 +34,7 @@ function ItemDetail() {
           <button type="button" aria-label="Favourite"><Heart className="size-7" /></button>
         </header>
         <div className="relative min-h-[520px] overflow-hidden bg-cafe-blue text-cafe-on-blue">
-          <div className="relative z-[3] w-[53%] px-6 pt-6">
+          <div className="relative z-[3] px-6 pt-6">
             <h1 className="text-[29px] font-bold leading-[1.05]">{item.name}</h1>
             <div className="mt-[13px] text-base text-cafe-stars">★★★★★ <span className="ml-1 text-cafe-on-blue">4.8</span></div>
             <h3 className="mt-[27px] text-lg font-bold">Description</h3>
@@ -42,7 +42,6 @@ function ItemDetail() {
             <p className="mt-[22px] text-[28px] font-bold">₹{item.price}</p>
             <Link to="/category/$name" params={{ name: item.category }} className="mt-5 inline-block rounded-full bg-cafe-surface/15 px-4 py-2 text-xs font-bold">{item.category}</Link>
           </div>
-          <img src={item.image} alt={item.name} className="animate-drink-float absolute -right-[55px] bottom-[-25px] h-[390px] w-[280px] rounded-[45px] object-cover drop-shadow-cafe-strong" />
         </div>
       </article>
     </main>

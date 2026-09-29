@@ -3,7 +3,6 @@ import { ArrowLeft, ArrowRight, Heart, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { categories, menuItems, type MenuItem } from "@/data/menu";
-import logo from "@/assets/logo.png.asset.json";
 import introVideo from "@/assets/bake-n-love-intro.mp4.asset.json";
 import introPoster from "@/assets/bake-n-love-intro-poster.webp.asset.json";
 
@@ -99,9 +98,6 @@ function Menu() {
     <div className="min-h-screen bg-cafe-page font-cafe text-cafe-ink">
       <div className="mx-auto min-h-screen w-full max-w-[430px] overflow-hidden bg-cafe-surface shadow-cafe-shell">
         <header className="flex h-[140px] items-center gap-3 rounded-b-[35px] bg-cafe-blue px-[22px] pb-5 pt-[35px] text-cafe-on-blue">
-          <div className="grid size-14 shrink-0 place-items-center rounded-full bg-cafe-surface">
-            <img src={logo.url} alt="Bake 'N Love" className="size-14 object-contain" />
-          </div>
           <div>
             <h1 className="text-[19px] font-bold">Bake 'N Love</h1>
             <p className="mt-1 text-xs text-cafe-on-blue/70">Good food. Good mood.</p>
@@ -122,15 +118,12 @@ function Menu() {
           </div>
           <div className="-mr-[22px] flex gap-[15px] overflow-x-auto py-7 pr-[22px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {menuItems.slice(0, 6).map((item) => (
-              <article key={item.id} onClick={() => setDetail(item)} className="animate-card-in relative h-[305px] min-w-[160px] cursor-pointer rounded-[25px] bg-cafe-card p-[13px]">
+              <article key={item.id} onClick={() => setDetail(item)} className="animate-card-in relative flex h-[170px] min-w-[160px] cursor-pointer flex-col justify-end rounded-[25px] bg-cafe-card p-[13px]">
                 <button type="button" aria-label={`Favourite ${item.name}`} onClick={(event) => { event.stopPropagation(); toggleFavourite(item.id); }}
                   className="absolute right-[13px] top-[13px] z-10 text-cafe-heart">
                   <Heart className="size-[22px]" fill={favourites.has(item.id) ? "currentColor" : "none"} />
                 </button>
-                <div className="flex h-[190px] items-center justify-center overflow-hidden rounded-[18px]">
-                  <img src={item.image} alt={item.name} className="h-[185px] w-[145px] object-cover drop-shadow-cafe" />
-                </div>
-                <h3 className="mt-2 truncate text-base font-bold">{item.name}</h3>
+                <h3 className="pr-5 text-base font-bold">{item.name}</h3>
                 <div className="mt-[7px] flex items-center justify-between">
                   <span className="text-[21px] font-bold text-cafe-blue">₹{item.price}</span>
                   <span className="grid size-11 place-items-center rounded-[13px] bg-cafe-ink text-cafe-surface"><ArrowRight className="size-5" /></span>
@@ -147,15 +140,14 @@ function Menu() {
             <h2 className="mt-[7px] text-[38px] font-bold leading-[0.98]">{special.name}</h2>
             <p className="mt-[13px] text-xl font-bold">₹{special.price}</p>
           </div>
-          <button type="button" onClick={() => setDetail(special)} className="absolute -right-[65px] top-[30px] z-[3] size-[330px]">
-            <img key={special.id} src={special.image} alt={special.name} className="animate-drink-float size-full rounded-[36px] object-cover drop-shadow-cafe-strong" />
+          <button type="button" onClick={() => setDetail(special)} aria-label={`Open ${special.name}`}
+            className="absolute right-[30px] top-[90px] z-[3] grid size-[88px] place-items-center rounded-full border-2 border-cafe-on-blue text-cafe-on-blue">
+            <ArrowRight className="size-8" />
           </button>
           <div className="absolute left-[38px] top-[35px] z-[6] flex flex-col gap-[15px]">
             {specials.slice(0, 3).map((item, index) => (
-              <button key={item.id} type="button" onClick={() => setSpecialIndex(index)}
-                className={`size-[62px] overflow-hidden rounded-full border-2 p-[5px] ${index === specialIndex ? "border-cafe-on-blue bg-cafe-on-blue/25" : "border-cafe-on-blue/70 bg-cafe-on-blue/10"} ${index === 1 ? "ml-[65px]" : index === 2 ? "ml-[55px]" : ""}`}>
-                <img src={item.image} alt={item.name} className="size-full rounded-full object-cover" />
-              </button>
+              <button key={item.id} type="button" onClick={() => setSpecialIndex(index)} aria-label={`Show ${item.name}`}
+                className={`size-4 rounded-full border-2 ${index === specialIndex ? "border-cafe-on-blue bg-cafe-on-blue" : "border-cafe-on-blue/70 bg-transparent"}`} />
             ))}
           </div>
         </section>
@@ -179,9 +171,6 @@ function Menu() {
               {category.items.map((item) => (
                 <button key={item.id} type="button" onClick={() => setDetail(item)}
                   className="mb-3 flex min-h-[100px] w-full items-center gap-3 rounded-[20px] bg-cafe-row p-3 text-left">
-                  <span className="grid size-[78px] shrink-0 place-items-center overflow-hidden rounded-[17px] bg-cafe-card">
-                    <img src={item.image} alt={item.name} className="size-[72px] rounded-[14px] object-cover" />
-                  </span>
                   <span className="min-w-0 flex-1">
                     <strong className="block text-[15px]">{item.name}</strong>
                     {item.description ? <span className="mt-[5px] line-clamp-2 block text-xs leading-[1.35] text-cafe-muted">{item.description}</span> : null}
@@ -213,7 +202,6 @@ function Menu() {
                 <p className="mt-[10px] text-sm leading-[1.55] text-cafe-detail-copy">{detail.description || `Freshly prepared ${detail.name}, served with Bake 'N Love care.`}</p>
                 <div className="mt-[22px] text-[28px] font-bold">₹{detail.price}</div>
               </div>
-              <img src={detail.image} alt={detail.name} className="animate-drink-float absolute -right-[55px] bottom-[-25px] h-[390px] w-[280px] rounded-[45px] object-cover drop-shadow-cafe-strong" />
             </div>
           </> : null}
         </section>
