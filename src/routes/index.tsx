@@ -119,6 +119,7 @@ function Menu() {
           <div className="-mr-[22px] flex gap-[15px] overflow-x-auto py-7 pr-[22px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {menuItems.slice(0, 6).map((item) => (
               <article key={item.id} onClick={() => setDetail(item)} className="animate-card-in relative flex h-[170px] min-w-[160px] cursor-pointer flex-col justify-end rounded-[25px] bg-cafe-card p-[13px]">
+                {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="absolute left-[13px] top-[6px] size-9 object-contain" /> : null}
                 <button type="button" aria-label={`Favourite ${item.name}`} onClick={(event) => { event.stopPropagation(); toggleFavourite(item.id); }}
                   className="absolute right-[13px] top-[13px] z-10 text-cafe-heart">
                   <Heart className="size-[22px]" fill={favourites.has(item.id) ? "currentColor" : "none"} />
@@ -135,6 +136,7 @@ function Menu() {
 
         <section className="relative mt-[27px] h-[475px] overflow-hidden rounded-t-[30px] bg-cafe-blue text-cafe-on-blue">
           <div className="absolute -right-[180px] top-5 size-[390px] rounded-full border-[70px] border-cafe-ring" />
+          {special.image ? <img src={special.image} alt={special.name} className="absolute right-2 top-[185px] h-[205px] w-[205px] object-contain" /> : null}
           <div className="absolute left-8 bottom-[34px] z-10 max-w-[185px]">
             <small className="text-sm text-cafe-on-blue/65">Special</small>
             <h2 className="mt-[7px] text-[38px] font-bold leading-[0.98]">{special.name}</h2>
@@ -180,6 +182,7 @@ function Menu() {
                     </span>
                     <span className="mt-1 block text-[17px] font-bold text-cafe-blue">₹{item.price}</span>
                   </span>
+                  {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="size-[76px] shrink-0 object-contain" /> : null}
                 </button>
               ))}
             </div>
@@ -195,6 +198,7 @@ function Menu() {
               <button type="button" aria-label="Favourite" onClick={() => toggleFavourite(detail.id)}><Heart className="size-7" fill={favourites.has(detail.id) ? "currentColor" : "none"} /></button>
             </header>
             <div className="relative min-h-[520px] overflow-hidden bg-cafe-blue text-cafe-on-blue">
+              {detail.image ? <img src={detail.image} alt={detail.name} className="absolute right-2 top-[90px] h-[260px] w-[47%] object-contain" /> : null}
               <div className="relative z-[3] w-[53%] px-6 pt-6">
                 <h1 className="text-[29px] font-bold leading-[1.05]">{detail.name}</h1>
                 <div className="mt-[13px] text-base text-cafe-stars">★★★★★ <span className="ml-1 text-cafe-on-blue">4.8</span></div>

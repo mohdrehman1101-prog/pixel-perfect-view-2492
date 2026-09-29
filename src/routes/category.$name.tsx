@@ -40,6 +40,7 @@ function CategoryPage() {
             {items.map((item) => (
               <Link key={item.id} to="/item/$id" params={{ id: item.id }} className="mb-3 flex min-h-[100px] items-center gap-3 rounded-[20px] bg-cafe-row p-3">
                 <span className="min-w-0 flex-1"><strong className="block text-[15px]">{item.name}</strong>{item.description ? <span className="mt-1 line-clamp-2 block text-xs text-cafe-muted">{item.description}</span> : null}<span className="mt-1 block text-[17px] font-bold text-cafe-blue">₹{item.price}</span></span>
+                {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="size-[76px] shrink-0 object-contain" /> : null}
                 <ArrowRight className="size-5 shrink-0 text-cafe-blue" />
               </Link>
             ))}
