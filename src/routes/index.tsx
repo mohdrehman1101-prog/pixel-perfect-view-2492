@@ -119,7 +119,7 @@ function Menu() {
           <div className="-mr-[22px] flex gap-[15px] overflow-x-auto py-7 pr-[22px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {menuItems.slice(0, 6).map((item) => (
               <article key={item.id} onClick={() => setDetail(item)} className="animate-card-in relative flex h-[170px] min-w-[160px] cursor-pointer flex-col justify-end rounded-[25px] bg-cafe-card p-[13px]">
-                {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="absolute left-[13px] top-[8px] size-[72px] object-contain" /> : null}
+                {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="absolute left-[13px] top-[6px] size-9 object-contain" /> : null}
                 <button type="button" aria-label={`Favourite ${item.name}`} onClick={(event) => { event.stopPropagation(); toggleFavourite(item.id); }}
                   className="absolute right-[13px] top-[13px] z-10 text-cafe-heart">
                   <Heart className="size-[22px]" fill={favourites.has(item.id) ? "currentColor" : "none"} />

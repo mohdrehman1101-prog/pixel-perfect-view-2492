@@ -35,7 +35,7 @@ function ItemDetail() {
         </header>
         <div className="relative min-h-[520px] overflow-hidden bg-cafe-blue text-cafe-on-blue">
           {item.image ? <img src={item.image} alt={item.name} className="absolute right-2 top-[90px] h-[260px] w-[47%] object-contain" /> : null}
-          <div className="relative z-[3] px-6 pt-6">
+          <div className={`relative z-[3] px-6 pt-6 ${item.image ? "w-[53%]" : ""}`}>
             <h1 className="text-[29px] font-bold leading-[1.05]">{item.name}</h1>
             <div className="mt-[13px] text-base text-cafe-stars">★★★★★ <span className="ml-1 text-cafe-on-blue">4.8</span></div>
             <h3 className="mt-[27px] text-lg font-bold">Description</h3>
