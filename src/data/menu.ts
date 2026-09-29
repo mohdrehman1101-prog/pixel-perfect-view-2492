@@ -1,9 +1,7 @@
-import margherita from "@/assets/margherita.png.asset.json";
-import chickenTikka from "@/assets/chicken_tikka.png.asset.json";
-import coldCoffee from "@/assets/cold_coffee.png.asset.json";
-import berrySmoothie from "@/assets/berry_smoothie.png.asset.json";
-import veggiePizza from "@/assets/veggie_pizza.png.asset.json";
-import orangeJuice from "@/assets/orange_juice.png.asset.json";
+const dishPhotos = import.meta.glob<{ url: string }>("../assets/dishes/*.png.asset.json", { eager: true, import: "default" });
+const photoByName = Object.fromEntries(
+  Object.entries(dishPhotos).map(([path, photo]) => [path.split("/").pop()?.replace(/\.png\.asset\.json$/, ""), photo.url]),
+);
 
 export type MenuItem = {
   id: string;
@@ -13,7 +11,7 @@ export type MenuItem = {
   label?: string | undefined;
   category: string;
   veg: boolean;
-  image: string;
+  image?: string;
 };
 
 type Raw = [name: string, price: string, description?: string | undefined, label?: string | undefined];
@@ -362,30 +360,6 @@ function isVeg(name: string) {
   return !NON_VEG.test(name);
 }
 
-const DRINK_CATEGORIES = [
-  "Iced Black Coffee",
-  "Cold Brew",
-  "Cold Coffee",
-  "Shake Laboratory",
-  "Hot Coffee (Black)",
-  "Hot Coffee (With Milk)",
-];
-
-function pickImage(category: string, name: string, veg: boolean) {
-  if (DRINK_CATEGORIES.includes(category)) return coldCoffee.url;
-  if (category === "Smoothies") return berrySmoothie.url;
-  if (category === "Coolers") return orangeJuice.url;
-  if (category === "Pizzeria Mode") {
-    if (!veg) return chickenTikka.url;
-    if (/vegetable|verona|corn/i.test(name)) return veggiePizza.url;
-    return margherita.url;
-  }
-  if (/waffle|cheese cake|pastry|brownie|doughnut|swiss roll|chocolava|oreo|kit kat|nutella|biscoff|delight/i.test(name))
-    return berrySmoothie.url;
-  if (!veg) return chickenTikka.url;
-  return veggiePizza.url;
-}
-
 export const categories = CATEGORIES.map((c) => ({ name: c.name, icon: c.icon, note: c.note }));
 
 let itemCounter = 0;
@@ -401,7 +375,7 @@ export const menuItems: MenuItem[] = CATEGORIES.flatMap((c) =>
       label: label ?? c.label,
       category: c.name,
       veg,
-      image: pickImage(c.name, name, veg),
+      image: photoByName[name],
     };
   }),
 );

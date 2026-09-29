@@ -11,3 +11,4 @@
 
 The menu intro uses the original uploaded MP4 via Lovable Assets and a first-frame poster; show it on the first menu visit per tab, then skip it on returns so navigation stays seamless.
 The main menu translates the user-supplied premium café HTML/CSS/JavaScript interface into React while sourcing every dish name and rupee price from src/data/menu.ts.
+Dish photos are loaded from exact filename-to-menu-name matches in uploaded CDN asset pointers; unmatched menu items stay image-free to prevent misleading substitutions.
